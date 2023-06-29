@@ -1,0 +1,75 @@
+# PowerShell script example: generate_return_value.ps1
+
+$returnValue = "Some value"
+
+# Output the return value
+Write-Output $returnValue
+
+# Exit the script with the return value as the exit code
+exit $returnValue
+
+
+stage('Run PowerShell Script') {
+    steps {
+        script {
+            def returnValue = bat(returnStatus: true, script: 'powershell.exe -File generate_return_value.ps1')
+            echo "Return value: ${returnValue}"
+        }
+    }
+}
+
+(or)
+
+stage('Run PowerShell Script') {
+    steps {
+        script {
+            def returnValue = bat(returnStatus: true, script: 'powershell.exe -File generate_return_value.ps1')
+            echo "Return value: ${returnValue}"
+            
+            if (returnValue != 'Some value') {
+                error("Return value is not as per the requirement. Exiting stage.")
+            }
+        }
+    }
+}
+
+*******************************************************
+stage('Run PowerShell Script') {
+    steps {
+        script {
+            def returnValue = bat(returnStatus: true, script: 'powershell.exe -File generate_return_value.ps1')
+            echo "Return value: ${returnValue}"
+            
+            if (returnValue != 'Some value') {
+                error("Return value does not meet the requirement. Exiting stage.")
+            }
+        }
+    }
+}
+
+// The pipeline will not proceed beyond this point if the previous stage failed
+stage('Proceed Further') {
+    steps {
+        // This stage will only execute if the previous stage passed
+        echo "Continuing with pipeline execution..."
+    }
+}
+
+******************************************************
+stage('Conditional Stage') {
+    steps {
+        script {
+            if (condition) {
+                // Code to execute if condition is true
+                echo "Condition is true"
+            } else {
+                // Code to execute if condition is false
+                echo "Condition is false"
+                return
+            }
+
+            // Code that will be executed if the condition is true
+            echo "Continuing with pipeline execution..."
+        }
+    }
+}
